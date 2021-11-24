@@ -22,6 +22,7 @@ body.style.backgroundColor = "#abbaab";
 
 const currentDate = Date.now();
 let dateElClock = null;
+let intervalId = null;
 refs.startBtn.disabled = true;
   
   const options = {
@@ -34,6 +35,7 @@ refs.startBtn.disabled = true;
       dateElClock= selectedDates[0]; 
       if (dateElClock > currentDate) {
         refs.startBtn.disabled = false;
+      
       } else {
        Notify.failure("Please choose a date in the future");
     }}
@@ -43,7 +45,8 @@ const flatpickrEl  = new flatpickr(refs.startInput, options);
 refs.startBtn.addEventListener('click',updateClockRun);
 
 function updateClockRun() {
-       setInterval(() => {
+  
+    intervalId =  setInterval(() => {
     const currentDate = Date.now();
     const deltaTime = dateElClock - currentDate;
     refs.days.textContent = convertMs(deltaTime).days;
@@ -51,9 +54,18 @@ function updateClockRun() {
     refs.minutes.textContent = convertMs(deltaTime).minutes;
     refs.seconds.textContent = convertMs(deltaTime).seconds;
     refs.startBtn.disabled = true;
-    flatpickrEl.input.setAttribute("disabled", "disabled")
-  }, 1000);
+       flatpickrEl.input.setAttribute("disabled", "disabled")
+       if (deltaTime < 1000) {
+     clearInterval(intervalId);
+  refs.days.textContent = '00';
+  refs.hours.textContent = '00';
+  refs.minutes.textContent = '00';
+  refs.seconds.textContent = '00';
+  refs.startInput.disabled = false;
+    }  
+     }, 1000);
 }
+
 function  convertMs(ms) {
   // Number of milliseconds per unit of time
   const second = 1000;
